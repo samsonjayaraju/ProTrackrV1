@@ -41,8 +41,6 @@ export function LandingPage() {
                         </div>
                         <div className="hidden md:flex items-center space-x-8">
                             <a className="text-gray-600 dark:text-gray-300 hover:text-[#FF6B35] font-medium transition-colors" href="#">Features</a>
-                            <a className="text-gray-600 dark:text-gray-300 hover:text-[#FF6B35] font-medium transition-colors" href="#">Pricing</a>
-                            <a className="text-gray-600 dark:text-gray-300 hover:text-[#FF6B35] font-medium transition-colors" href="#">Community</a>
                             <div className="flex items-center space-x-4">
                                 <button onClick={() => navigate('/login')} className="font-bold text-gray-900 dark:text-white hover:text-[#FF6B35] transition-colors">Log In</button>
                                 <button onClick={() => navigate('/login')} className="px-6 py-2.5 bg-[#FF6B35] text-white font-bold rounded-xl border-2 border-gray-900 dark:border-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-0.5 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 active:shadow-none">
@@ -91,11 +89,9 @@ export function LandingPage() {
                             </div>
                             <div className="pt-8 flex items-center justify-center lg:justify-start gap-6 text-sm font-medium text-gray-500 dark:text-gray-400">
                                 <div className="flex items-center gap-2">
-                                    <CheckCircle2 className="w-5 h-5 text-green-500" /> No credit card required
+                                    <CheckCircle2 className="w-5 h-5 text-green-500" /> Always Free for Students
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <CheckCircle2 className="w-5 h-5 text-green-500" /> 14-day free trial
-                                </div>
+
                             </div>
                         </div>
 
@@ -111,7 +107,7 @@ export function LandingPage() {
                                     </div>
                                     <div className="p-8 flex flex-col items-center">
                                         <img alt="Student Illustration" className="w-32 h-32 rounded-full border-4 border-[#FFD700] object-cover mb-4 shadow-md bg-blue-100" src="https://api.dicebear.com/7.x/notionists/svg?seed=Sarah&backgroundColor=b6e3f4" />
-                                        <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Sarah Jenkins</h3>
+                                        <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Samson </h3>
                                         <p className="text-[#9C27B0] font-medium mb-6">Computer Science Student</p>
                                         <div className="w-full space-y-4">
                                             <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-800">
@@ -162,7 +158,7 @@ export function LandingPage() {
                                 <div className="p-3 bg-[#FF6B35]/20 rounded-lg text-[#FF6B35]">
                                     <Users className="w-8 h-8" />
                                 </div>
-                                <h3 className="text-4xl font-bold text-gray-900 dark:text-white">50k+</h3>
+                                <h3 className="text-4xl font-bold text-gray-900 dark:text-white">10+</h3>
                             </div>
                             <p className="text-gray-600 dark:text-gray-400 font-medium">Active Students using ProTrackr daily.</p>
                         </div>
@@ -171,7 +167,7 @@ export function LandingPage() {
                                 <div className="p-3 bg-[#9C27B0]/20 rounded-lg text-[#9C27B0]">
                                     <School className="w-8 h-8" />
                                 </div>
-                                <h3 className="text-4xl font-bold text-gray-900 dark:text-white">120+</h3>
+                                <h3 className="text-4xl font-bold text-gray-900 dark:text-white">1+</h3>
                             </div>
                             <p className="text-gray-600 dark:text-gray-400 font-medium">Universities partnered worldwide.</p>
                         </div>
@@ -180,7 +176,7 @@ export function LandingPage() {
                                 <div className="p-3 bg-[#FFD700]/20 rounded-lg text-yellow-600 dark:text-yellow-400">
                                     <FolderOpen className="w-8 h-8" />
                                 </div>
-                                <h3 className="text-4xl font-bold text-gray-900 dark:text-white">1M+</h3>
+                                <h3 className="text-4xl font-bold text-gray-900 dark:text-white">10+</h3>
                             </div>
                             <p className="text-gray-600 dark:text-gray-400 font-medium">Projects showcased this year.</p>
                         </div>
@@ -199,24 +195,48 @@ export function LandingPage() {
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {/* Feature 1 */}
-                        <div className="group">
+                        <div className="group flex flex-col">
                             <div className="relative mb-6">
-                                <div className="absolute inset-0 bg-[#FF6B35]/10 rounded-2xl transform rotate-3 group-hover:rotate-6 transition-transform"></div>
-                                <div className="relative bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border-2 border-gray-900 dark:border-gray-600 shadow-sm group-hover:shadow-md transition-all">
-                                    <div className="aspect-video bg-gray-100 dark:bg-gray-700 p-4 flex items-center justify-center relative overflow-hidden">
-                                        <div className="absolute top-0 left-0 w-full h-8 bg-gray-200 dark:bg-gray-600 flex items-center px-2 space-x-1">
-                                            <div className="w-2 h-2 rounded-full bg-red-400"></div>
-                                            <div className="w-2 h-2 rounded-full bg-yellow-400"></div>
+                                <div className="relative bg-gray-50 dark:bg-gray-800 rounded-3xl overflow-hidden border-2 border-gray-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all h-[280px] flex flex-col">
+                                    <div className="bg-white dark:bg-gray-700 p-4 flex gap-2 border-b-2 border-gray-900">
+                                        <div className="w-3.5 h-3.5 rounded-full bg-[#FF5F56] border-2 border-gray-900"></div>
+                                        <div className="w-3.5 h-3.5 rounded-full bg-[#FFBD2E] border-2 border-gray-900"></div>
+                                        <div className="w-3.5 h-3.5 rounded-full bg-[#27C93F] border-2 border-gray-900"></div>
+                                    </div>
+                                    <div className="p-5 flex flex-col gap-4 flex-1 bg-white">
+                                        {/* Stats row */}
+                                        <div className="flex gap-4">
+                                            <div className="flex-1 border-2 border-gray-100 rounded-2xl p-4 flex flex-col justify-center">
+                                                <div className="w-8 h-1.5 bg-[#FF6B35] rounded-full mb-3"></div>
+                                                <div className="text-sm font-black text-gray-800">128</div>
+                                                <div className="text-[8px] font-bold text-gray-400 mt-1">COMMITS</div>
+                                            </div>
+                                            <div className="flex-1 border-2 border-gray-100 rounded-2xl p-4 flex flex-col justify-center">
+                                                <div className="w-8 h-1.5 bg-[#9C27B0] rounded-full mb-3"></div>
+                                                <div className="text-sm font-black text-gray-800">92%</div>
+                                                <div className="text-[8px] font-bold text-gray-400 mt-1">PROGRESS</div>
+                                            </div>
                                         </div>
-                                        <div className="mt-4 w-3/4 h-3/4 bg-white dark:bg-gray-800 rounded shadow-sm border border-gray-200 dark:border-gray-600 p-2 space-y-2">
-                                            <div className="h-2 w-1/2 bg-gray-200 dark:bg-gray-600 rounded"></div>
-                                            <div className="h-20 bg-blue-50 dark:bg-blue-900/20 rounded border border-blue-100 dark:border-blue-800"></div>
+                                        {/* Chart row */}
+                                        <div className="flex items-end justify-between h-20 border-b-2 border-gray-100 pb-0 gap-1 mt-1 px-2">
+                                            <div className="w-[15%] h-8 bg-[#FFD700]/30 rounded-t-2xl"></div>
+                                            <div className="w-[18%] h-12 bg-[#FF6B35]/40 rounded-t-2xl"></div>
+                                            <div className="w-[20%] h-16 bg-[#FF6B35] rounded-t-2xl"></div>
+                                            <div className="w-[18%] h-10 bg-[#FF6B35]/40 rounded-t-2xl"></div>
+                                            <div className="w-[18%] h-14 bg-[#FF6B35] rounded-t-2xl"></div>
+                                        </div>
+                                        {/* Bottom row */}
+                                        <div className="mt-auto h-12 bg-[#FFD700]/10 rounded-xl border-2 border-[#FFD700]/30 flex items-center px-4 gap-3">
+                                            <div className="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center">
+                                                <div className="w-2.5 h-2.5 rounded-full bg-gray-300"></div>
+                                            </div>
+                                            <div className="h-2 w-24 bg-gray-300 rounded-full"></div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div className="text-center md:text-left">
-                                <div className="inline-flex items-center justify-center p-3 bg-[#FF6B35] text-white rounded-xl mb-4 border-2 border-gray-900 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                            <div className="text-center md:text-left mt-2">
+                                <div className="inline-flex items-center justify-center p-3 bg-[#FF6B35] text-white rounded-full mb-4 border-[3px] border-gray-900 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] w-14 h-14">
                                     <LayoutDashboard className="w-6 h-6" />
                                 </div>
                                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Project Overview</h3>
@@ -225,25 +245,46 @@ export function LandingPage() {
                         </div>
 
                         {/* Feature 2 */}
-                        <div className="group">
+                        <div className="group flex flex-col">
                             <div className="relative mb-6">
-                                <div className="absolute inset-0 bg-[#9C27B0]/10 rounded-2xl transform -rotate-2 group-hover:-rotate-4 transition-transform"></div>
-                                <div className="relative bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border-2 border-gray-900 dark:border-gray-600 shadow-sm group-hover:shadow-md transition-all">
-                                    <div className="aspect-video bg-gray-100 dark:bg-gray-700 p-4 flex items-center justify-center relative overflow-hidden">
-                                        <div className="absolute top-0 left-0 w-full h-8 bg-gray-200 dark:bg-gray-600 flex items-center px-2 space-x-1">
-                                            <div className="w-2 h-2 rounded-full bg-red-400"></div>
-                                            <div className="w-2 h-2 rounded-full bg-yellow-400"></div>
+                                <div className="relative bg-gray-50 dark:bg-gray-800 rounded-3xl overflow-hidden border-2 border-gray-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all h-[280px] flex flex-col">
+                                    <div className="bg-white dark:bg-gray-700 p-4 flex gap-2 border-b-2 border-gray-900">
+                                        <div className="w-3.5 h-3.5 rounded-full bg-[#FF5F56] border-2 border-gray-900"></div>
+                                        <div className="w-3.5 h-3.5 rounded-full bg-[#FFBD2E] border-2 border-gray-900"></div>
+                                        <div className="w-3.5 h-3.5 rounded-full bg-[#27C93F] border-2 border-gray-900"></div>
+                                    </div>
+                                    <div className="p-6 flex flex-col items-center justify-center gap-8 flex-1 bg-gray-50/50">
+                                        {/* Avatars */}
+                                        <div className="flex -space-x-3 items-center">
+                                            <div className="w-12 h-12 rounded-full bg-indigo-100 border-[3px] border-gray-900 shadow-sm flex items-center justify-center text-xs font-black z-10 text-gray-700">JD</div>
+                                            <div className="w-12 h-12 rounded-full bg-blue-100 border-[3px] border-gray-900 shadow-sm flex items-center justify-center text-xs font-black z-20 text-gray-700">AN</div>
+                                            <div className="w-12 h-12 rounded-full bg-purple-100 border-[3px] border-gray-900 shadow-sm flex items-center justify-center text-xs font-black z-30 text-gray-700">SK</div>
+                                            <div className="w-12 h-12 rounded-full bg-[#FFD700] border-[3px] border-gray-900 shadow-sm flex items-center justify-center text-xs font-black z-40 text-gray-900">+5</div>
                                         </div>
-                                        <div className="mt-4 flex gap-2 w-full justify-center">
-                                            <div className="w-10 h-10 rounded-full bg-purple-200 dark:bg-purple-800 border-2 border-white dark:border-gray-600 -mr-4 z-10"></div>
-                                            <div className="w-10 h-10 rounded-full bg-blue-200 dark:bg-blue-800 border-2 border-white dark:border-gray-600 -mr-4 z-20"></div>
-                                            <div className="w-10 h-10 rounded-full bg-yellow-200 dark:bg-yellow-800 border-2 border-white dark:border-gray-600 z-30 flex items-center justify-center text-xs font-bold text-black">+5</div>
+                                        {/* Comment box */}
+                                        <div className="w-full bg-white rounded-3xl border-2 border-gray-900 p-5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex flex-col gap-4">
+                                            <div className="flex gap-3 items-center">
+                                                <div className="w-3 h-3 rounded-full bg-[#9C27B0]"></div>
+                                                <div className="h-3 w-full bg-gray-100 rounded-full"></div>
+                                            </div>
+                                            <div className="h-3 w-4/5 bg-gray-100 rounded-full ml-6"></div>
+                                            <div className="flex gap-3 mt-2">
+                                                <div className="bg-gray-100 rounded-full px-4 py-2 flex items-center gap-1.5 cursor-pointer hover:bg-gray-200">
+                                                    <span className="text-[10px] font-black text-gray-600">👍 LIKE</span>
+                                                </div>
+                                                <div className="bg-[#9C27B0] rounded-full px-4 py-2 flex items-center gap-1.5 cursor-pointer hover:bg-purple-700">
+                                                    <span className="text-[10px] font-black text-white flex items-center gap-1">
+                                                        <svg className="w-3 h-3 text-white fill-current" viewBox="0 0 24 24"><path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z" /></svg>
+                                                        REPLY
+                                                    </span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div className="text-center md:text-left">
-                                <div className="inline-flex items-center justify-center p-3 bg-[#9C27B0] text-white rounded-xl mb-4 border-2 border-gray-900 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                            <div className="text-center md:text-left mt-2">
+                                <div className="inline-flex items-center justify-center p-3 bg-[#9C27B0] text-white rounded-full mb-4 border-[3px] border-gray-900 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] w-14 h-14">
                                     <Users className="w-6 h-6" />
                                 </div>
                                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Peer Review</h3>
@@ -252,26 +293,43 @@ export function LandingPage() {
                         </div>
 
                         {/* Feature 3 */}
-                        <div className="group">
+                        <div className="group flex flex-col">
                             <div className="relative mb-6">
-                                <div className="absolute inset-0 bg-[#FFD700]/20 rounded-2xl transform rotate-2 group-hover:rotate-4 transition-transform"></div>
-                                <div className="relative bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border-2 border-gray-900 dark:border-gray-600 shadow-sm group-hover:shadow-md transition-all">
-                                    <div className="aspect-video bg-gray-100 dark:bg-gray-700 p-4 flex items-center justify-center relative overflow-hidden">
-                                        <div className="absolute top-0 left-0 w-full h-8 bg-gray-200 dark:bg-gray-600 flex items-center px-2 space-x-1">
-                                            <div className="w-2 h-2 rounded-full bg-red-400"></div>
-                                            <div className="w-2 h-2 rounded-full bg-yellow-400"></div>
+                                <div className="relative bg-gray-50 dark:bg-gray-800 rounded-3xl overflow-hidden border-2 border-gray-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all h-[280px] flex flex-col">
+                                    <div className="bg-white dark:bg-gray-700 p-4 flex gap-2 border-b-2 border-gray-900">
+                                        <div className="w-3.5 h-3.5 rounded-full bg-[#FF5F56] border-2 border-gray-900"></div>
+                                        <div className="w-3.5 h-3.5 rounded-full bg-[#FFBD2E] border-2 border-gray-900"></div>
+                                        <div className="w-3.5 h-3.5 rounded-full bg-[#27C93F] border-2 border-gray-900"></div>
+                                    </div>
+                                    <div className="p-3 grid grid-cols-2 grid-rows-2 gap-3 flex-1 bg-white">
+                                        <div className="bg-[#607D51] rounded-2xl flex items-center justify-center relative overflow-hidden border-2 border-gray-900 shadow-sm">
+                                            <span className="text-6xl text-white/50 font-light font-serif mix-blend-overlay">1</span>
+                                            <div className="absolute bottom-3 right-3 bg-[#FFD700] text-gray-900 text-[10px] font-black px-3 py-1 rounded-full border-2 border-gray-900">VIEW</div>
                                         </div>
-                                        <div className="mt-4 w-3/4 h-3/4 grid grid-cols-2 gap-2">
-                                            <div className="bg-indigo-100 dark:bg-indigo-900/50 rounded"></div>
-                                            <div className="bg-indigo-100 dark:bg-indigo-900/50 rounded"></div>
-                                            <div className="bg-indigo-100 dark:bg-indigo-900/50 rounded"></div>
-                                            <div className="bg-indigo-100 dark:bg-indigo-900/50 rounded"></div>
+                                        <div className="bg-[#2D4A3D] rounded-2xl flex items-center justify-center relative p-4 border-2 border-gray-900 shadow-sm">
+                                            <div className="border border-white/20 rounded-lg w-full h-full p-3 flex flex-col gap-2">
+                                                <div className="h-1.5 w-full bg-white/40 mb-2 rounded-full"></div>
+                                                <div className="h-1.5 w-3/4 bg-white/20 rounded-full"></div>
+                                                <div className="h-1.5 w-1/2 bg-white/20 rounded-full"></div>
+                                            </div>
+                                            <div className="absolute bottom-3 right-3 bg-[#FFD700] text-gray-900 text-[10px] font-black px-3 py-1 rounded-full border-2 border-gray-900">VIEW</div>
+                                        </div>
+                                        <div className="bg-[#4D6451] rounded-2xl flex items-center justify-center relative overflow-hidden border-2 border-gray-900 shadow-sm">
+                                            <span className="text-7xl text-black/20 font-light font-serif mb-2">0</span>
+                                            <div className="absolute bottom-3 right-3 bg-[#FFD700] text-gray-900 text-[10px] font-black px-3 py-1 rounded-full border-2 border-gray-900">VIEW</div>
+                                        </div>
+                                        <div className="bg-[#1C3630] rounded-2xl flex items-end justify-start relative p-2 overflow-hidden border-2 border-gray-900 shadow-sm">
+                                            <div className="w-16 h-16 bg-white/10 rounded-tr-[2rem] absolute bottom-0 left-0"></div>
+                                            <div className="absolute bottom-3 right-3 flex gap-2 items-center">
+                                                <div className="bg-white/20 text-white text-[10px] px-2 py-1 rounded font-mono font-bold">4</div>
+                                                <div className="bg-[#FFD700] text-gray-900 text-[10px] font-black px-3 py-1 rounded-full border-2 border-gray-900">VIEW</div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div className="text-center md:text-left">
-                                <div className="inline-flex items-center justify-center p-3 bg-[#FFD700] text-gray-900 rounded-xl mb-4 border-2 border-gray-900 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                            <div className="text-center md:text-left mt-2">
+                                <div className="inline-flex items-center justify-center p-3 bg-[#FFD700] text-gray-900 rounded-full mb-4 border-[3px] border-gray-900 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] w-14 h-14">
                                     <Images className="w-6 h-6" />
                                 </div>
                                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Portfolio Showcase</h3>
@@ -290,7 +348,7 @@ export function LandingPage() {
                         <span className="font-sans text-2xl font-bold tracking-tight text-gray-800 dark:text-gray-300">Stanford</span>
                         <span className="font-serif italic text-2xl text-gray-800 dark:text-gray-300">Berkeley</span>
                         <span className="font-bold text-2xl text-gray-800 dark:text-gray-300 uppercase tracking-widest">Yale</span>
-                        <span className="font-mono text-xl font-bold text-gray-800 dark:text-gray-300">HARVARD</span>
+                        <span className="font-mono text-xl font-bold text-gray-800 dark:text-gray-300">KL University</span>
                     </div>
                 </div>
             </section>
