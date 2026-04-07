@@ -1,25 +1,32 @@
+import { useState, useEffect } from 'react';
 import { BarChart3, TrendingUp, Presentation, Download } from 'lucide-react';
 import { Card, CardContent } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
-
-const completionData = [
-    { name: 'Computer Science', completed: 180, inProgress: 45 },
-    { name: 'Data Science', completed: 120, inProgress: 60 },
-    { name: 'Information Tech', completed: 90, inProgress: 30 },
-    { name: 'Software Eng', completed: 110, inProgress: 40 },
-];
-
-const trendData = [
-    { name: 'Week 1', projects: 12 },
-    { name: 'Week 2', projects: 28 },
-    { name: 'Week 3', projects: 45 },
-    { name: 'Week 4', projects: 85 },
-    { name: 'Week 5', projects: 140 },
-    { name: 'Week 6', projects: 210 },
-];
+import { statsService } from '../../services/api';
 
 export function Reports() {
+    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        statsService.getReports()
+            .then(res => setData(res.data))
+            .catch(err => console.error('Failed to load reports:', err))
+            .finally(() => setLoading(false));
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center py-20">
+                <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        );
+    }
+
+    const byDepartment = data?.byDepartment || [];
+    const trend = data?.trend || [];
+
     return (
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -43,8 +50,7 @@ export function Reports() {
                         <div>
                             <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">Avg. Completion Rate</p>
                             <div className="flex items-end gap-2">
-                                <h3 className="text-2xl font-bold text-text-main-light dark:text-white">78%</h3>
-                                <span className="text-xs text-green-500 font-medium mb-1">+5% vs last sem</span>
+                                <h3 className="text-2xl font-bold text-text-main-light dark:text-white">{data?.avgCompletion || 0}%</h3>
                             </div>
                         </div>
                     </CardContent>
@@ -58,8 +64,7 @@ export function Reports() {
                         <div>
                             <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">Total Projects Submitted</p>
                             <div className="flex items-end gap-2">
-                                <h3 className="text-2xl font-bold text-text-main-light dark:text-white">856</h3>
-                                <span className="text-xs text-green-500 font-medium mb-1">+12% vs last sem</span>
+                                <h3 className="text-2xl font-bold text-text-main-light dark:text-white">{data?.totalSubmitted || 0}</h3>
                             </div>
                         </div>
                     </CardContent>
@@ -73,8 +78,7 @@ export function Reports() {
                         <div>
                             <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">Avg Feedback Time</p>
                             <div className="flex items-end gap-2">
-                                <h3 className="text-2xl font-bold text-text-main-light dark:text-white">1.8 Days</h3>
-                                <span className="text-xs text-red-500 font-medium mb-1">-0.4 Days vs last sem</span>
+                                <h3 className="text-2xl font-bold text-text-main-light dark:text-white">{data?.avgReviewTime || '0'} Days</h3>
                             </div>
                         </div>
                     </CardContent>
@@ -86,33 +90,41 @@ export function Reports() {
                     <CardContent>
                         <h3 className="text-lg font-bold text-text-main-light dark:text-white mb-6">Projects by Department</h3>
                         <div className="h-80 w-full">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={completionData} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#DFEAF2" />
-                                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#718EBF', fontSize: 12 }} />
-                                    <YAxis axisLine={false} tickLine={false} tick={{ fill: '#718EBF', fontSize: 12 }} />
-                                    <RechartsTooltip cursor={{ fill: '#F5F7FA' }} contentStyle={{ borderRadius: '16px', border: '2px solid #111827', boxShadow: '4px 4px 0px 0px rgba(0,0,0,1)' }} />
-                                    <Bar dataKey="completed" name="Completed" stackId="a" fill="#FF6B35" radius={[0, 0, 4, 4]} barSize={40} />
-                                    <Bar dataKey="inProgress" name="In Progress" stackId="a" fill="#9C27B0" radius={[4, 4, 0, 0]} />
-                                </BarChart>
-                            </ResponsiveContainer>
+                            {byDepartment.length > 0 ? (
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart data={byDepartment} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#DFEAF2" />
+                                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#718EBF', fontSize: 12 }} />
+                                        <YAxis axisLine={false} tickLine={false} tick={{ fill: '#718EBF', fontSize: 12 }} />
+                                        <RechartsTooltip cursor={{ fill: '#F5F7FA' }} contentStyle={{ borderRadius: '16px', border: '2px solid #111827', boxShadow: '4px 4px 0px 0px rgba(0,0,0,1)' }} />
+                                        <Bar dataKey="completed" name="Completed" stackId="a" fill="#FF6B35" radius={[0, 0, 4, 4]} barSize={40} />
+                                        <Bar dataKey="inProgress" name="In Progress" stackId="a" fill="#9C27B0" radius={[4, 4, 0, 0]} />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                <div className="flex items-center justify-center h-full text-text-secondary-light">No department data available.</div>
+                            )}
                         </div>
                     </CardContent>
                 </Card>
 
                 <Card>
                     <CardContent>
-                        <h3 className="text-lg font-bold text-text-main-light dark:text-white mb-6">Cumulative Submissions Trend</h3>
+                        <h3 className="text-lg font-bold text-text-main-light dark:text-white mb-6">Submissions Trend</h3>
                         <div className="h-80 w-full">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <LineChart data={trendData} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#DFEAF2" />
-                                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#718EBF', fontSize: 12 }} />
-                                    <YAxis axisLine={false} tickLine={false} tick={{ fill: '#718EBF', fontSize: 12 }} />
-                                    <RechartsTooltip contentStyle={{ borderRadius: '16px', border: '2px solid #111827', boxShadow: '4px 4px 0px 0px rgba(0,0,0,1)' }} />
-                                    <Line type="monotone" dataKey="projects" name="Total Submissions" stroke="#FFD700" strokeWidth={4} dot={{ r: 4, fill: '#FFD700', strokeWidth: 2, stroke: '#111827' }} activeDot={{ r: 6 }} />
-                                </LineChart>
-                            </ResponsiveContainer>
+                            {trend.length > 0 ? (
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <LineChart data={trend} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#DFEAF2" />
+                                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#718EBF', fontSize: 12 }} />
+                                        <YAxis axisLine={false} tickLine={false} tick={{ fill: '#718EBF', fontSize: 12 }} />
+                                        <RechartsTooltip contentStyle={{ borderRadius: '16px', border: '2px solid #111827', boxShadow: '4px 4px 0px 0px rgba(0,0,0,1)' }} />
+                                        <Line type="monotone" dataKey="projects" name="Total Submissions" stroke="#FFD700" strokeWidth={4} dot={{ r: 4, fill: '#FFD700', strokeWidth: 2, stroke: '#111827' }} activeDot={{ r: 6 }} />
+                                    </LineChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                <div className="flex items-center justify-center h-full text-text-secondary-light">No trend data available yet.</div>
+                            )}
                         </div>
                     </CardContent>
                 </Card>

@@ -1,6 +1,7 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, FolderOpen, UserCircle, Award, Settings, LogOut } from 'lucide-react';
 import clsx from 'clsx';
+import { useAuth } from '../../context/AuthContext';
 
 const navItems = [
     { path: '/student', label: 'Dashboard', icon: LayoutDashboard },
@@ -11,6 +12,13 @@ const navItems = [
 
 export function StudentSidebar() {
     const location = useLocation();
+    const navigate = useNavigate();
+    const { logout, user } = useAuth();
+
+    const handleLogout = () => {
+        logout();
+        navigate('/login');
+    };
 
     return (
         <aside className="hidden w-64 flex-col border-r-2 border-gray-900 dark:border-gray-600 bg-card-light dark:bg-card-dark md:flex transition-colors duration-200">
@@ -43,14 +51,30 @@ export function StudentSidebar() {
                     );
                 })}
             </nav>
+
+            {/* User info */}
+            <div className="px-6 py-3 border-t border-border-light dark:border-border-dark">
+                <div className="flex items-center gap-3">
+                    <img
+                        src={user?.avatar_url ? user.avatar_url : `https://api.dicebear.com/7.x/notionists/svg?seed=${user?.full_name || 'Felix'}&backgroundColor=b6e3f4`}
+                        alt=""
+                        className="w-8 h-8 rounded-full bg-gray-100"
+                    />
+                    <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-text-main-light dark:text-white truncate">{user?.full_name}</p>
+                        <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark truncate">{user?.email}</p>
+                    </div>
+                </div>
+            </div>
+
             <div className="p-4 border-t-2 border-gray-900 dark:border-gray-600">
-                <Link
-                    to="/login"
-                    className="relative flex items-center gap-4 rounded-xl py-3 pl-8 pr-4 transition-all text-gray-600 dark:text-gray-400 hover:text-[#FE5C73] dark:hover:text-[#FE5C73] hover:bg-red-50 dark:hover:bg-red-900/20"
+                <button
+                    onClick={handleLogout}
+                    className="w-full relative flex items-center gap-4 rounded-xl py-3 pl-8 pr-4 transition-all text-gray-600 dark:text-gray-400 hover:text-[#FE5C73] dark:hover:text-[#FE5C73] hover:bg-red-50 dark:hover:bg-red-900/20"
                 >
                     <LogOut className="w-6 h-6" />
                     <span className="font-medium">Logout</span>
-                </Link>
+                </button>
             </div>
         </aside>
     );

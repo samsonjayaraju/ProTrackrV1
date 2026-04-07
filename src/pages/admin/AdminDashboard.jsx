@@ -1,10 +1,52 @@
+import { useState, useEffect } from 'react';
 import { Users, FileText, CheckCircle, Clock } from 'lucide-react';
 import { Card, CardContent } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { useNavigate } from 'react-router-dom';
+import { statsService } from '../../services/api';
 
 export function AdminDashboard() {
     const navigate = useNavigate();
+    const [stats, setStats] = useState({ totalStudents: 0, totalProjects: 0, pendingReviews: 0, completed: 0 });
+    const [submissions, setSubmissions] = useState([]);
+    const [statusOverview, setStatusOverview] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        statsService.getAdminStats()
+            .then(res => {
+                setStats(res.data.stats);
+                setSubmissions(res.data.recentSubmissions);
+                setStatusOverview(res.data.statusOverview);
+            })
+            .catch(err => console.error('Failed to load admin stats:', err))
+            .finally(() => setLoading(false));
+    }, []);
+
+    const timeAgo = (dateStr) => {
+        const diff = Date.now() - new Date(dateStr).getTime();
+        const hours = Math.floor(diff / 3600000);
+        if (hours < 1) return 'Just now';
+        if (hours < 24) return `${hours}h ago`;
+        const days = Math.floor(hours / 24);
+        return days === 1 ? 'Yesterday' : `${days} days ago`;
+    };
+
+    const getStatusCount = (status) => {
+        const s = statusOverview.find(o => o.status === status);
+        return s ? s.count : 0;
+    };
+
+    const totalAll = statusOverview.reduce((acc, s) => acc + s.count, 0);
+    const getStatusPct = (status) => totalAll > 0 ? Math.round((getStatusCount(status) / totalAll) * 100) : 0;
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center py-20">
+                <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-8">
@@ -17,7 +59,7 @@ export function AdminDashboard() {
                         </div>
                         <div>
                             <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">Total Students</p>
-                            <h3 className="text-2xl font-bold text-text-main-light dark:text-white">248</h3>
+                            <h3 className="text-2xl font-bold text-text-main-light dark:text-white">{stats.totalStudents}</h3>
                         </div>
                     </CardContent>
                 </Card>
@@ -28,7 +70,7 @@ export function AdminDashboard() {
                         </div>
                         <div>
                             <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">Total Projects</p>
-                            <h3 className="text-2xl font-bold text-text-main-light dark:text-white">856</h3>
+                            <h3 className="text-2xl font-bold text-text-main-light dark:text-white">{stats.totalProjects}</h3>
                         </div>
                     </CardContent>
                 </Card>
@@ -39,7 +81,7 @@ export function AdminDashboard() {
                         </div>
                         <div>
                             <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">Pending Reviews</p>
-                            <h3 className="text-2xl font-bold text-text-main-light dark:text-white">32</h3>
+                            <h3 className="text-2xl font-bold text-text-main-light dark:text-white">{stats.pendingReviews}</h3>
                         </div>
                     </CardContent>
                 </Card>
@@ -50,18 +92,16 @@ export function AdminDashboard() {
                         </div>
                         <div>
                             <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">Completed</p>
-                            <h3 className="text-2xl font-bold text-text-main-light dark:text-white">614</h3>
+                            <h3 className="text-2xl font-bold text-text-main-light dark:text-white">{stats.completed}</h3>
                         </div>
                     </CardContent>
                 </Card>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Main Content Area */}
                 <div className="lg:col-span-2 space-y-6">
                     <div className="flex items-center justify-between">
                         <h3 className="text-xl font-semibold text-text-main-light dark:text-white">Recent Submissions for Review</h3>
-                        <a href="#" className="text-sm font-medium text-text-secondary-light hover:text-primary dark:text-text-secondary-dark dark:hover:text-white">View All Pending</a>
                     </div>
 
                     <Card>
@@ -76,21 +116,23 @@ export function AdminDashboard() {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-border-light dark:divide-border-dark">
-                                    {[
-                                        { id: '101', title: 'Machine Learning Image Classifier', student: 'Alex Johnson', date: '2 hours ago' },
-                                        { id: '102', title: 'React Final Project', student: 'Samson Jayaraju', date: '5 hours ago' },
-                                        { id: '103', title: 'Database Design Document', student: 'Maria Garcia', date: '1 day ago' },
-                                        { id: '104', title: 'iOS App Prototype', student: 'James Smith', date: '2 days ago' },
-                                    ].map((sub) => (
+                                    {submissions.length === 0 && (
+                                        <tr><td colSpan={4} className="px-6 py-8 text-center text-text-secondary-light">No pending submissions.</td></tr>
+                                    )}
+                                    {submissions.map((sub) => (
                                         <tr key={sub.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
                                             <td className="px-6 py-4 font-medium">{sub.title}</td>
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-2">
-                                                    <img src={`https://api.dicebear.com/7.x/notionists/svg?seed=${sub.student}`} alt="" className="w-6 h-6 rounded-full bg-gray-100" />
-                                                    {sub.student}
+                                                    <img
+                                                        src={sub.avatar_url ? sub.avatar_url : `https://api.dicebear.com/7.x/notionists/svg?seed=${sub.student_name}`}
+                                                        alt=""
+                                                        className="w-6 h-6 rounded-full bg-gray-100"
+                                                    />
+                                                    {sub.student_name}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 text-text-secondary-light dark:text-text-secondary-dark">{sub.date}</td>
+                                            <td className="px-6 py-4 text-text-secondary-light dark:text-text-secondary-dark">{timeAgo(sub.updated_at)}</td>
                                             <td className="px-6 py-4 text-right">
                                                 <Button variant="outline" size="sm" onClick={() => navigate(`/admin/projects/${sub.id}`)}>Review</Button>
                                             </td>
@@ -102,19 +144,17 @@ export function AdminDashboard() {
                     </Card>
                 </div>
 
-                {/* Sidebar Space */}
                 <div className="space-y-8">
                     <div className="flex flex-col gap-5">
                         <h3 className="text-xl font-semibold text-text-main-light dark:text-white">Quick Actions</h3>
                         <div className="flex flex-col gap-4">
-                            <Button size="lg" className="w-full justify-start shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-primary text-white">
+                            <Button size="lg" className="w-full justify-start shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-primary text-white" onClick={() => navigate('/admin/reports')}>
                                 <span className="flex-1 text-left py-2">
                                     <p className="font-bold">Generate Report</p>
                                     <p className="text-xs text-white/80 font-normal">Monthly performance</p>
                                 </span>
                                 <span>→</span>
                             </Button>
-
                             <Button size="lg" variant="secondary" className="w-full justify-start rounded-2xl shadow-sm border border-transparent dark:border-border-dark" onClick={() => navigate('/admin/students')}>
                                 <span className="flex-1 text-left py-2">
                                     <p className="font-bold text-text-main-light dark:text-white">Manage Students</p>
@@ -133,28 +173,28 @@ export function AdminDashboard() {
                                     <div>
                                         <div className="flex justify-between text-sm mb-1">
                                             <span className="font-medium text-text-main-light dark:text-white">Completed</span>
-                                            <span className="text-text-secondary-light dark:text-text-secondary-dark">614</span>
+                                            <span className="text-text-secondary-light dark:text-text-secondary-dark">{getStatusCount('Completed')}</span>
                                         </div>
                                         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                            <div className="bg-green-500 h-2 rounded-full" style={{ width: '70%' }}></div>
+                                            <div className="bg-green-500 h-2 rounded-full" style={{ width: `${getStatusPct('Completed')}%` }}></div>
                                         </div>
                                     </div>
                                     <div>
                                         <div className="flex justify-between text-sm mb-1">
                                             <span className="font-medium text-text-main-light dark:text-white">In Progress</span>
-                                            <span className="text-text-secondary-light dark:text-text-secondary-dark">210</span>
+                                            <span className="text-text-secondary-light dark:text-text-secondary-dark">{getStatusCount('In Progress')}</span>
                                         </div>
                                         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                            <div className="bg-primary h-2 rounded-full" style={{ width: '25%' }}></div>
+                                            <div className="bg-primary h-2 rounded-full" style={{ width: `${getStatusPct('In Progress')}%` }}></div>
                                         </div>
                                     </div>
                                     <div>
                                         <div className="flex justify-between text-sm mb-1">
-                                            <span className="font-medium text-text-main-light dark:text-white">Pending Review</span>
-                                            <span className="text-text-secondary-light dark:text-text-secondary-dark">32</span>
+                                            <span className="font-medium text-text-main-light dark:text-white">Submitted</span>
+                                            <span className="text-text-secondary-light dark:text-text-secondary-dark">{getStatusCount('Submitted')}</span>
                                         </div>
                                         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                            <div className="bg-yellow-500 h-2 rounded-full" style={{ width: '5%' }}></div>
+                                            <div className="bg-yellow-500 h-2 rounded-full" style={{ width: `${getStatusPct('Submitted')}%` }}></div>
                                         </div>
                                     </div>
                                 </div>
