@@ -1,35 +1,21 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Search, Filter, Mail, Link as LinkIcon, ExternalLink } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Badge } from '../../components/ui/Badge';
-import { userService } from '../../services/api';
+
+const mockStudents = [
+    { id: 1, name: 'Alex Johnson', roll: 'CS2026-001', dept: 'Computer Science', year: 'Senior', projects: 12, topSkill: 'React' },
+    { id: 2, name: 'Samson Jayaraju', roll: 'CS2026-042', dept: 'Computer Science', year: 'Senior', projects: 8, topSkill: 'UI/UX' },
+    { id: 3, name: 'Maria Garcia', roll: 'DS2026-015', dept: 'Data Science', year: 'Junior', projects: 5, topSkill: 'Python' },
+    { id: 4, name: 'James Smith', roll: 'SE2026-088', dept: 'Software Eng', year: 'Sophomore', projects: 3, topSkill: 'Swift' },
+    { id: 5, name: 'Linda Chen', roll: 'CS2026-102', dept: 'Computer Science', year: 'Senior', projects: 15, topSkill: 'Node.js' },
+    { id: 6, name: 'Robert Fox', roll: 'IT2026-033', dept: 'Information Tech', year: 'Junior', projects: 6, topSkill: 'Cybersecurity' },
+];
 
 export function StudentsList() {
-    const [students, setStudents] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        userService.getAll()
-            .then(res => setStudents(res.data.students))
-            .catch(err => console.error('Failed to load students:', err))
-            .finally(() => setLoading(false));
-    }, []);
-
-    const filtered = students.filter(s =>
-        s.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (s.roll_number || '').toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center py-20">
-                <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-            </div>
-        );
-    }
 
     return (
         <div className="space-y-6">
@@ -63,35 +49,32 @@ export function StudentsList() {
                             <tr>
                                 <th className="px-6 py-4 rounded-tl-3xl">Student Info</th>
                                 <th className="px-6 py-4">Department & Year</th>
+                                <th className="px-6 py-4">Top Skill</th>
                                 <th className="px-6 py-4 text-center">Projects</th>
                                 <th className="px-6 py-4 text-right rounded-tr-3xl">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-border-light dark:divide-border-dark">
-                            {filtered.length === 0 && (
-                                <tr><td colSpan={4} className="px-6 py-8 text-center text-text-secondary-light">No students found.</td></tr>
-                            )}
-                            {filtered.map((student) => (
+                            {mockStudents.filter(s => s.name.toLowerCase().includes(searchTerm.toLowerCase()) || s.roll.toLowerCase().includes(searchTerm.toLowerCase())).map((student) => (
                                 <tr key={student.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
-                                            <img
-                                                src={student.avatar_url ? student.avatar_url : `https://api.dicebear.com/7.x/notionists/svg?seed=${student.full_name}`}
-                                                alt={student.full_name}
-                                                className="w-10 h-10 rounded-full bg-gray-100"
-                                            />
+                                            <img src={`https://api.dicebear.com/7.x/notionists/svg?seed=${student.name}`} alt={student.name} className="w-10 h-10 rounded-full bg-gray-100" />
                                             <div>
-                                                <div className="font-bold">{student.full_name}</div>
-                                                <div className="text-xs text-text-secondary-light dark:text-text-secondary-dark">{student.roll_number || 'N/A'}</div>
+                                                <div className="font-bold">{student.name}</div>
+                                                <div className="text-xs text-text-secondary-light dark:text-text-secondary-dark">{student.roll}</div>
                                             </div>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <div>{student.department || 'N/A'}</div>
-                                        <div className="text-xs text-text-secondary-light dark:text-text-secondary-dark">{student.year || 'N/A'}</div>
+                                        <div>{student.dept}</div>
+                                        <div className="text-xs text-text-secondary-light dark:text-text-secondary-dark">{student.year}</div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <Badge variant="info">{student.topSkill}</Badge>
                                     </td>
                                     <td className="px-6 py-4 text-center font-bold">
-                                        {student.project_count}
+                                        {student.projects}
                                     </td>
                                     <td className="px-6 py-4 text-right">
                                         <div className="flex justify-end gap-2">
@@ -107,7 +90,14 @@ export function StudentsList() {
                 </div>
 
                 <div className="p-4 border-t border-border-light dark:border-border-dark flex justify-between items-center text-sm text-text-secondary-light dark:text-text-secondary-dark">
-                    <div>Showing {filtered.length} of {students.length} students</div>
+                    <div>Showing 1 to 6 of 248 entries</div>
+                    <div className="flex gap-1">
+                        <button className="px-3 py-1 rounded bg-gray-100 dark:bg-gray-800 disabled:opacity-50" disabled>Prev</button>
+                        <button className="px-3 py-1 rounded bg-primary text-white">1</button>
+                        <button className="px-3 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800">2</button>
+                        <button className="px-3 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800">3</button>
+                        <button className="px-3 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800">Next</button>
+                    </div>
                 </div>
             </Card>
         </div>

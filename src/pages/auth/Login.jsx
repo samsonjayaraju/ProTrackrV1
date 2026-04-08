@@ -1,72 +1,23 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
-import { Mail, Lock, User, School, AlertCircle, Loader2 } from 'lucide-react';
+import { Mail, Lock, User, School } from 'lucide-react';
 
 export function Login() {
     const navigate = useNavigate();
-    const { login, register } = useAuth();
     const [isLogin, setIsLogin] = useState(true);
-    const [loading, setLoading] = useState(false);
-    const [formData, setFormData] = useState({
-        full_name: '',
-        email: '',
-        password: '',
-    });
-    const [errors, setErrors] = useState({});
-    const [apiError, setApiError] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
 
-    const validateForm = () => {
-        const newErrors = {};
-        if (!formData.email.trim()) {
-            newErrors.email = 'Email is required';
-        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            newErrors.email = 'Please enter a valid email';
-        }
-        if (!formData.password) {
-            newErrors.password = 'Password is required';
-        } else if (!isLogin && formData.password.length < 6) {
-            newErrors.password = 'Password must be at least 6 characters';
-        }
-        if (!isLogin && !formData.full_name.trim()) {
-            newErrors.full_name = 'Full name is required';
-        }
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
-
-    const handleChange = (field) => (e) => {
-        setFormData(prev => ({ ...prev, [field]: e.target.value }));
-        if (errors[field]) setErrors(prev => ({ ...prev, [field]: '' }));
-        if (apiError) setApiError('');
-    };
-
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
-        if (!validateForm()) return;
 
-        setLoading(true);
-        setApiError('');
-
-        try {
-            if (isLogin) {
-                const user = await login(formData.email, formData.password);
-                navigate(user.role === 'admin' ? '/admin' : '/student');
-            } else {
-                await register({
-                    full_name: formData.full_name,
-                    email: formData.email,
-                    password: formData.password,
-                });
-                navigate('/student');
-            }
-        } catch (err) {
-            const msg = err.response?.data?.error || err.response?.data?.errors?.[0]?.msg || 'Something went wrong. Please try again.';
-            setApiError(msg);
-        } finally {
-            setLoading(false);
+        // Dummy authentication logic
+        if (email.toLowerCase().includes('admin')) {
+            navigate('/admin');
+        } else {
+            navigate('/student');
         }
     };
 
@@ -102,39 +53,34 @@ export function Login() {
                             {isLogin ? 'Please enter your details to sign in.' : 'Enter your details to register as a student.'}
                         </p>
 
-                        {apiError && (
-                            <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl flex items-start gap-3">
-                                <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
-                                <p className="text-sm text-red-600 dark:text-red-400">{apiError}</p>
-                            </div>
-                        )}
-
                         <form onSubmit={handleSubmit} className="space-y-5">
                             {!isLogin && (
-                                <div>
-                                    <label className="block text-sm font-medium text-text-main-light dark:text-white mb-2">Full Name</label>
-                                    <Input
-                                        icon={<User className="w-5 h-5" />}
-                                        placeholder="John Doe"
-                                        value={formData.full_name}
-                                        onChange={handleChange('full_name')}
-                                    />
-                                    {errors.full_name && <p className="text-xs text-red-500 mt-1 ml-1">{errors.full_name}</p>}
+                                <div className="space-y-5">
+                                    <div>
+                                        <label className="block text-sm font-medium text-text-main-light dark:text-white mb-2">Full Name</label>
+                                        <Input icon={<User className="w-5 h-5" />} placeholder="John Doe" required />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-text-main-light dark:text-white mb-2">College Email</label>
+                                        <Input type="email" icon={<School className="w-5 h-5" />} placeholder="student@university.edu" required />
+                                        <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark mt-1 ml-1">Must be an institutional email address.</p>
+                                    </div>
                                 </div>
                             )}
 
-                            <div>
-                                <label className="block text-sm font-medium text-text-main-light dark:text-white mb-2">Email</label>
-                                <Input
-                                    type="email"
-                                    icon={isLogin ? <Mail className="w-5 h-5" /> : <School className="w-5 h-5" />}
-                                    placeholder={isLogin ? 'Enter your email' : 'student@university.edu'}
-                                    value={formData.email}
-                                    onChange={handleChange('email')}
-                                />
-                                {errors.email && <p className="text-xs text-red-500 mt-1 ml-1">{errors.email}</p>}
-                                {!isLogin && <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark mt-1 ml-1">Use any email to register.</p>}
-                            </div>
+                            {isLogin && (
+                                <div>
+                                    <label className="block text-sm font-medium text-text-main-light dark:text-white mb-2">Email</label>
+                                    <Input
+                                        type="email"
+                                        icon={<Mail className="w-5 h-5" />}
+                                        placeholder="Enter your email (use 'admin' for Teacher view)"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                            )}
 
                             <div>
                                 <label className="block text-sm font-medium text-text-main-light dark:text-white mb-2">Password</label>
@@ -142,10 +88,10 @@ export function Login() {
                                     type="password"
                                     icon={<Lock className="w-5 h-5" />}
                                     placeholder="••••••••"
-                                    value={formData.password}
-                                    onChange={handleChange('password')}
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
                                 />
-                                {errors.password && <p className="text-xs text-red-500 mt-1 ml-1">{errors.password}</p>}
                             </div>
 
                             {isLogin && (
@@ -158,31 +104,21 @@ export function Login() {
                                 </div>
                             )}
 
-                            <Button type="submit" className="w-full mt-2" size="lg" disabled={loading}>
-                                {loading ? (
-                                    <span className="flex items-center gap-2">
-                                        <Loader2 className="w-5 h-5 animate-spin" />
-                                        {isLogin ? 'Signing In...' : 'Creating Account...'}
-                                    </span>
-                                ) : (
-                                    isLogin ? 'Sign In' : 'Sign Up'
-                                )}
+                            <Button type="submit" className="w-full mt-2" size="lg">
+                                {isLogin ? 'Sign In' : 'Sign Up'}
                             </Button>
-
-                            {isLogin && (
-                                <div className="text-center">
-                                    <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark">
-                                        Use your registered account to sign in.
-                                    </p>
-                                </div>
-                            )}
+                            <div className="w-full space-y-4">
+                                <Button type="button" onClick={() => navigate('/admin')} variant="outline" className="w-full">
+                                    Admin Login (Demo)
+                                </Button>
+                            </div>
                         </form>
 
                         <div className="mt-8 text-center">
                             <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">
                                 {isLogin ? "Don't have an account? " : "Already have an account? "}
                                 <button
-                                    onClick={() => { setIsLogin(!isLogin); setErrors({}); setApiError(''); }}
+                                    onClick={() => setIsLogin(!isLogin)}
                                     className="font-bold text-gray-900 dark:text-white hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary"
                                 >
                                     {isLogin ? 'Sign up' : 'Log in'}
