@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
-import { Mail, Lock, User, School, AlertCircle, Loader2 } from 'lucide-react';
+import { Mail, Lock, User, School, AlertCircle, Loader2, Shield } from 'lucide-react';
 
 export function Login() {
     const navigate = useNavigate();
     const { login, register } = useAuth();
     const [isLogin, setIsLogin] = useState(true);
+    const [loginRole, setLoginRole] = useState('student');
+    const [signupRole, setSignupRole] = useState('student');
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         full_name: '',
@@ -59,8 +61,9 @@ export function Login() {
                     full_name: formData.full_name,
                     email: formData.email,
                     password: formData.password,
+                    role: signupRole === 'faculty' ? 'admin' : 'student',
                 });
-                navigate('/student');
+                navigate(signupRole === 'faculty' ? '/admin' : '/student');
             }
         } catch (err) {
             const msg = err.response?.data?.error || err.response?.data?.errors?.[0]?.msg || 'Something went wrong. Please try again.';
@@ -110,25 +113,82 @@ export function Login() {
                         )}
 
                         <form onSubmit={handleSubmit} className="space-y-5">
-                            {!isLogin && (
+                            {isLogin && (
                                 <div>
-                                    <label className="block text-sm font-medium text-text-main-light dark:text-white mb-2">Full Name</label>
-                                    <Input
-                                        icon={<User className="w-5 h-5" />}
-                                        placeholder="John Doe"
-                                        value={formData.full_name}
-                                        onChange={handleChange('full_name')}
-                                    />
-                                    {errors.full_name && <p className="text-xs text-red-500 mt-1 ml-1">{errors.full_name}</p>}
+                                    <label className="block text-sm font-medium text-text-main-light dark:text-white mb-2">Sign in as</label>
+                                    <div className="flex gap-3">
+                                        <button
+                                            type="button"
+                                            onClick={() => setLoginRole('student')}
+                                            className={`flex-1 flex items-center justify-center gap-2 h-11 rounded-2xl border text-sm font-semibold transition-colors ${loginRole === 'student'
+                                                ? 'bg-primary text-white border-gray-900 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                                                : 'bg-white dark:bg-card-dark text-text-main-light dark:text-white border-border-light dark:border-border-dark'}`}
+                                        >
+                                            <School className="w-4 h-4" /> Student
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setLoginRole('faculty')}
+                                            className={`flex-1 flex items-center justify-center gap-2 h-11 rounded-2xl border text-sm font-semibold transition-colors ${loginRole === 'faculty'
+                                                ? 'bg-primary text-white border-gray-900 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                                                : 'bg-white dark:bg-card-dark text-text-main-light dark:text-white border-border-light dark:border-border-dark'}`}
+                                        >
+                                            <Shield className="w-4 h-4" /> Faculty
+                                        </button>
+                                    </div>
+                                    <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark mt-2">
+                                        {loginRole === 'faculty' ? 'Faculty accounts access admin dashboards.' : 'Student accounts access their project workspace.'}
+                                    </p>
                                 </div>
+                            )}
+                            {!isLogin && (
+                                <>
+                                    <div>
+                                        <label className="block text-sm font-medium text-text-main-light dark:text-white mb-2">Sign up as</label>
+                                        <div className="flex gap-3">
+                                            <button
+                                                type="button"
+                                                onClick={() => setSignupRole('student')}
+                                                className={`flex-1 flex items-center justify-center gap-2 h-11 rounded-2xl border text-sm font-semibold transition-colors ${signupRole === 'student'
+                                                    ? 'bg-primary text-white border-gray-900 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                                                    : 'bg-white dark:bg-card-dark text-text-main-light dark:text-white border-border-light dark:border-border-dark'}`}
+                                            >
+                                                <School className="w-4 h-4" /> Student
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setSignupRole('faculty')}
+                                                className={`flex-1 flex items-center justify-center gap-2 h-11 rounded-2xl border text-sm font-semibold transition-colors ${signupRole === 'faculty'
+                                                    ? 'bg-primary text-white border-gray-900 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                                                    : 'bg-white dark:bg-card-dark text-text-main-light dark:text-white border-border-light dark:border-border-dark'}`}
+                                            >
+                                                <Shield className="w-4 h-4" /> Faculty
+                                            </button>
+                                        </div>
+                                        <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark mt-2">
+                                            {signupRole === 'faculty' ? 'Faculty accounts access admin dashboards.' : 'Student accounts access their project workspace.'}
+                                        </p>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-text-main-light dark:text-white mb-2">Full Name</label>
+                                        <Input
+                                            icon={<User className="w-5 h-5" />}
+                                            placeholder="John Doe"
+                                            value={formData.full_name}
+                                            onChange={handleChange('full_name')}
+                                        />
+                                        {errors.full_name && <p className="text-xs text-red-500 mt-1 ml-1">{errors.full_name}</p>}
+                                    </div>
+                                </>
                             )}
 
                             <div>
                                 <label className="block text-sm font-medium text-text-main-light dark:text-white mb-2">Email</label>
                                 <Input
                                     type="email"
-                                    icon={isLogin ? <Mail className="w-5 h-5" /> : <School className="w-5 h-5" />}
-                                    placeholder={isLogin ? 'Enter your email' : 'student@university.edu'}
+                                    icon={isLogin ? <Mail className="w-5 h-5" /> : (signupRole === 'faculty' ? <Shield className="w-5 h-5" /> : <School className="w-5 h-5" />)}
+                                    placeholder={isLogin ? 'Enter your email' : (signupRole === 'faculty' ? 'faculty@university.edu' : 'student@university.edu')}
                                     value={formData.email}
                                     onChange={handleChange('email')}
                                 />

@@ -78,4 +78,18 @@ router.get('/all', authenticate, requireAdmin, asyncHandler(async (req, res) => 
   res.json({ students });
 }));
 
+// GET /api/users/:id - Admin or self: get user profile by id
+router.get('/:id', authenticate, asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  if (req.user.role !== 'admin' && req.user.id !== parseInt(id, 10)) {
+    return res.status(403).json({ error: 'Access denied.' });
+  }
+
+  const [rows] = await pool.query('SELECT * FROM users WHERE id = ?', [id]);
+  if (rows.length === 0) return res.status(404).json({ error: 'User not found.' });
+
+  res.json({ user: formatUser(rows[0]) });
+}));
+
 export default router;

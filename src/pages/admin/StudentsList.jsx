@@ -5,8 +5,10 @@ import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Badge } from '../../components/ui/Badge';
 import { userService } from '../../services/api';
+import { useNavigate } from 'react-router-dom';
 
 export function StudentsList() {
+    const navigate = useNavigate();
     const [students, setStudents] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
@@ -22,6 +24,40 @@ export function StudentsList() {
         s.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (s.roll_number || '').toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    const handleExportCsv = () => {
+        const headers = ['Full Name', 'Email', 'Department', 'Year', 'Roll Number', 'Projects'];
+        const rows = filtered.map(s => [
+            s.full_name || '',
+            s.email || '',
+            s.department || '',
+            s.year || '',
+            s.roll_number || '',
+            s.project_count ?? 0,
+        ]);
+
+        const escapeCell = (value) => {
+            const text = String(value ?? '');
+            if (text.includes('"') || text.includes(',') || text.includes('\n')) {
+                return `"${text.replace(/"/g, '""')}"`;
+            }
+            return text;
+        };
+
+        const csvContent = [headers, ...rows]
+            .map(row => row.map(escapeCell).join(','))
+            .join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `students_export_${new Date().toISOString().slice(0, 10)}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+    };
 
     if (loading) {
         return (
@@ -52,7 +88,7 @@ export function StudentsList() {
                             <option value="SE">Software Eng</option>
                         </select>
                     </div>
-                    <Button>Export CSV</Button>
+                    <Button onClick={handleExportCsv}>Export CSV</Button>
                 </div>
             </div>
 
@@ -97,7 +133,14 @@ export function StudentsList() {
                                         <div className="flex justify-end gap-2">
                                             <Button variant="ghost" size="sm" className="h-8 w-8 p-0"><Mail className="w-4 h-4 text-text-secondary-light" /></Button>
                                             <Button variant="ghost" size="sm" className="h-8 w-8 p-0"><LinkIcon className="w-4 h-4 text-text-secondary-light" /></Button>
-                                            <Button variant="outline" size="sm" className="gap-2"><ExternalLink className="w-4 h-4" /> Portfolio</Button>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="gap-2"
+                                                onClick={() => navigate(`/admin/students/${student.id}/portfolio`)}
+                                            >
+                                                <ExternalLink className="w-4 h-4" /> Portfolio
+                                            </Button>
                                         </div>
                                     </td>
                                 </tr>

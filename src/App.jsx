@@ -16,6 +16,7 @@ import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { StudentsList as AdminStudents } from './pages/admin/StudentsList';
 import { ProjectReview as AdminProjectReview } from './pages/admin/ProjectReview';
 import { Reports as AdminReports } from './pages/admin/Reports';
+import { StudentPortfolio as AdminStudentPortfolio } from './pages/admin/StudentPortfolio';
 import { LandingPage } from './pages/LandingPage';
 
 export default function App() {
@@ -47,6 +48,7 @@ export default function App() {
           }>
             <Route index element={<AdminDashboard />} />
             <Route path="students" element={<AdminStudents />} />
+            <Route path="students/:id/portfolio" element={<AdminStudentPortfolio />} />
             <Route path="projects/:id" element={<AdminProjectReview />} />
             <Route path="reports" element={<AdminReports />} />
           </Route>
