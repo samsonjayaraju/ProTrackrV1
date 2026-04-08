@@ -72,7 +72,6 @@ export const userService = {
   updateProfile: (data) => api.put('/users/profile', data),
   updatePassword: (data) => api.put('/users/password', data),
   getAll: () => api.get('/users/all'),
-  getById: (id) => api.get(`/users/${id}`),
 };
 
 // ============ Stats Service ============
