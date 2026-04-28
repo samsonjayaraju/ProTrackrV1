@@ -2,22 +2,104 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
-import { Mail, Lock, User, School } from 'lucide-react';
+import { Mail, Lock, User, School, Shield, AlertCircle, Loader2 } from 'lucide-react';
+import { authService } from '../../services/api';
 
 export function Login() {
     const navigate = useNavigate();
     const [isLogin, setIsLogin] = useState(true);
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [loginRole, setLoginRole] = useState('student');
+    const [signupRole, setSignupRole] = useState('student');
+    const [formData, setFormData] = useState({
+        full_name: '',
+        email: '',
+        password: '',
+    });
+    const [errors, setErrors] = useState({});
+    const [apiError, setApiError] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const handleSubmit = (e) => {
+    const validateForm = () => {
+        const newErrors = {};
+        if (!formData.email.trim()) {
+            newErrors.email = 'Email is required';
+        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+            newErrors.email = 'Please enter a valid email';
+        }
+        if (!formData.password) {
+            newErrors.password = 'Password is required';
+        } else if (!isLogin && formData.password.length < 6) {
+            newErrors.password = 'Password must be at least 6 characters';
+        }
+        if (!isLogin && !formData.full_name.trim()) {
+            newErrors.full_name = 'Full name is required';
+        }
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handleChange = (field) => (e) => {
+        setFormData(prev => ({ ...prev, [field]: e.target.value }));
+        if (errors[field]) setErrors(prev => ({ ...prev, [field]: '' }));
+        if (apiError) setApiError('');
+    };
+
+    const normalizeRole = (role) => {
+        if (!role) return '';
+        return String(role).toLowerCase().replace(/^role_/, '');
+    };
+
+    const isFacultyRole = (role) => {
+        const normalized = normalizeRole(role);
+        return ['admin', 'faculty', 'teacher', 'staff'].includes(normalized);
+    };
+
+    const unwrapAuthResponse = (response) => response?.data || response || {};
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!validateForm()) return;
 
-        // Dummy authentication logic
-        if (email.toLowerCase().includes('admin')) {
-            navigate('/admin');
-        } else {
-            navigate('/student');
+        setLoading(true);
+        setApiError('');
+
+        try {
+            if (isLogin) {
+                const response = await authService.login(formData.email, formData.password);
+                const authData = unwrapAuthResponse(response);
+                const token = authData?.token;
+                const user = authData?.user;
+                if (token) localStorage.setItem('protrackr_token', token);
+                if (user) localStorage.setItem('protrackr_user', JSON.stringify(user));
+
+                const facultyAccount = isFacultyRole(user?.role);
+                if (loginRole === 'faculty' && !facultyAccount) {
+                    localStorage.removeItem('protrackr_token');
+                    localStorage.removeItem('protrackr_user');
+                    setApiError('This account is not a faculty account.');
+                    return;
+                }
+
+                navigate(facultyAccount ? '/admin' : '/student');
+            } else {
+                const response = await authService.register({
+                    full_name: formData.full_name,
+                    email: formData.email,
+                    password: formData.password,
+                    role: signupRole === 'faculty' ? 'admin' : 'student',
+                });
+                const authData = unwrapAuthResponse(response);
+                const token = authData?.token;
+                const user = authData?.user;
+                if (token) localStorage.setItem('protrackr_token', token);
+                if (user) localStorage.setItem('protrackr_user', JSON.stringify(user));
+                const facultyAccount = isFacultyRole(user?.role) || signupRole === 'faculty';
+                navigate(facultyAccount ? '/admin' : '/student');
+            }
+        } catch (err) {
+            setApiError(err?.message || 'Something went wrong. Please try again.');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -50,37 +132,104 @@ export function Login() {
                             {isLogin ? 'Welcome Back!' : 'Create an Account'}
                         </h2>
                         <p className="text-text-secondary-light dark:text-text-secondary-dark mb-8">
-                            {isLogin ? 'Please enter your details to sign in.' : 'Enter your details to register as a student.'}
+                            {isLogin ? 'Please enter your details to sign in.' : `Enter your details to register as a ${signupRole === 'faculty' ? 'faculty' : 'student'}.`}
                         </p>
 
+                        {apiError && (
+                            <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl flex items-start gap-3">
+                                <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+                                <p className="text-sm text-red-600 dark:text-red-400">{apiError}</p>
+                            </div>
+                        )}
+
                         <form onSubmit={handleSubmit} className="space-y-5">
-                            {!isLogin && (
-                                <div className="space-y-5">
-                                    <div>
-                                        <label className="block text-sm font-medium text-text-main-light dark:text-white mb-2">Full Name</label>
-                                        <Input icon={<User className="w-5 h-5" />} placeholder="John Doe" required />
+                            {isLogin && (
+                                <div>
+                                    <label className="block text-sm font-medium text-text-main-light dark:text-white mb-2">Sign in as</label>
+                                    <div className="flex gap-3">
+                                        <button
+                                            type="button"
+                                            onClick={() => setLoginRole('student')}
+                                            className={`flex-1 flex items-center justify-center gap-2 h-11 rounded-2xl border text-sm font-semibold transition-colors ${loginRole === 'student'
+                                                ? 'bg-primary text-white border-gray-900 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                                                : 'bg-white dark:bg-card-dark text-text-main-light dark:text-white border-border-light dark:border-border-dark'}`}
+                                        >
+                                            <School className="w-4 h-4" /> Student
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setLoginRole('faculty')}
+                                            className={`flex-1 flex items-center justify-center gap-2 h-11 rounded-2xl border text-sm font-semibold transition-colors ${loginRole === 'faculty'
+                                                ? 'bg-primary text-white border-gray-900 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                                                : 'bg-white dark:bg-card-dark text-text-main-light dark:text-white border-border-light dark:border-border-dark'}`}
+                                        >
+                                            <Shield className="w-4 h-4" /> Faculty
+                                        </button>
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-text-main-light dark:text-white mb-2">College Email</label>
-                                        <Input type="email" icon={<School className="w-5 h-5" />} placeholder="student@university.edu" required />
-                                        <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark mt-1 ml-1">Must be an institutional email address.</p>
-                                    </div>
+                                    <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark mt-2">
+                                        {loginRole === 'faculty' ? 'Faculty accounts access admin dashboards.' : 'Student accounts access their project workspace.'}
+                                    </p>
                                 </div>
                             )}
 
-                            {isLogin && (
-                                <div>
-                                    <label className="block text-sm font-medium text-text-main-light dark:text-white mb-2">Email</label>
-                                    <Input
-                                        type="email"
-                                        icon={<Mail className="w-5 h-5" />}
-                                        placeholder="Enter your email (use 'admin' for Teacher view)"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        required
-                                    />
-                                </div>
+                            {!isLogin && (
+                                <>
+                                    <div>
+                                        <label className="block text-sm font-medium text-text-main-light dark:text-white mb-2">Sign up as</label>
+                                        <div className="flex gap-3">
+                                            <button
+                                                type="button"
+                                                onClick={() => setSignupRole('student')}
+                                                className={`flex-1 flex items-center justify-center gap-2 h-11 rounded-2xl border text-sm font-semibold transition-colors ${signupRole === 'student'
+                                                    ? 'bg-primary text-white border-gray-900 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                                                    : 'bg-white dark:bg-card-dark text-text-main-light dark:text-white border-border-light dark:border-border-dark'}`}
+                                            >
+                                                <School className="w-4 h-4" /> Student
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setSignupRole('faculty')}
+                                                className={`flex-1 flex items-center justify-center gap-2 h-11 rounded-2xl border text-sm font-semibold transition-colors ${signupRole === 'faculty'
+                                                    ? 'bg-primary text-white border-gray-900 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                                                    : 'bg-white dark:bg-card-dark text-text-main-light dark:text-white border-border-light dark:border-border-dark'}`}
+                                            >
+                                                <Shield className="w-4 h-4" /> Faculty
+                                            </button>
+                                        </div>
+                                        <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark mt-2">
+                                            {signupRole === 'faculty' ? 'Faculty accounts access admin dashboards.' : 'Student accounts access their project workspace.'}
+                                        </p>
+                                    </div>
+
+                                    <div className="space-y-5">
+                                        <div>
+                                            <label className="block text-sm font-medium text-text-main-light dark:text-white mb-2">Full Name</label>
+                                            <Input
+                                                icon={<User className="w-5 h-5" />}
+                                                placeholder="John Doe"
+                                                value={formData.full_name}
+                                                onChange={handleChange('full_name')}
+                                                required
+                                            />
+                                            {errors.full_name && <p className="text-xs text-red-500 mt-1 ml-1">{errors.full_name}</p>}
+                                        </div>
+                                    </div>
+                                </>
                             )}
+
+                            <div>
+                                <label className="block text-sm font-medium text-text-main-light dark:text-white mb-2">Email</label>
+                                <Input
+                                    type="email"
+                                    icon={isLogin ? <Mail className="w-5 h-5" /> : (signupRole === 'faculty' ? <Shield className="w-5 h-5" /> : <School className="w-5 h-5" />)}
+                                    placeholder={isLogin ? (loginRole === 'faculty' ? 'faculty@university.edu' : 'student@university.edu') : (signupRole === 'faculty' ? 'faculty@university.edu' : 'student@university.edu')}
+                                    value={formData.email}
+                                    onChange={handleChange('email')}
+                                    required
+                                />
+                                {errors.email && <p className="text-xs text-red-500 mt-1 ml-1">{errors.email}</p>}
+                                {!isLogin && <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark mt-1 ml-1">Use any email to register.</p>}
+                            </div>
 
                             <div>
                                 <label className="block text-sm font-medium text-text-main-light dark:text-white mb-2">Password</label>
@@ -88,10 +237,11 @@ export function Login() {
                                     type="password"
                                     icon={<Lock className="w-5 h-5" />}
                                     placeholder="••••••••"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
+                                    value={formData.password}
+                                    onChange={handleChange('password')}
                                     required
                                 />
+                                {errors.password && <p className="text-xs text-red-500 mt-1 ml-1">{errors.password}</p>}
                             </div>
 
                             {isLogin && (
@@ -104,21 +254,23 @@ export function Login() {
                                 </div>
                             )}
 
-                            <Button type="submit" className="w-full mt-2" size="lg">
-                                {isLogin ? 'Sign In' : 'Sign Up'}
+                            <Button type="submit" className="w-full mt-2" size="lg" disabled={loading}>
+                                {loading ? (
+                                    <span className="flex items-center gap-2">
+                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                        {isLogin ? 'Signing In...' : 'Creating Account...'}
+                                    </span>
+                                ) : (
+                                    isLogin ? 'Sign In' : 'Sign Up'
+                                )}
                             </Button>
-                            <div className="w-full space-y-4">
-                                <Button type="button" onClick={() => navigate('/admin')} variant="outline" className="w-full">
-                                    Admin Login (Demo)
-                                </Button>
-                            </div>
                         </form>
 
                         <div className="mt-8 text-center">
                             <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">
                                 {isLogin ? "Don't have an account? " : "Already have an account? "}
                                 <button
-                                    onClick={() => setIsLogin(!isLogin)}
+                                    onClick={() => { setIsLogin(!isLogin); setErrors({}); setApiError(''); }}
                                     className="font-bold text-gray-900 dark:text-white hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary"
                                 >
                                     {isLogin ? 'Sign up' : 'Log in'}

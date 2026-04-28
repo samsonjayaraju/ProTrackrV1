@@ -8,7 +8,7 @@ export function StudentLayout() {
         <div className="flex h-screen overflow-hidden bg-background-light dark:bg-background-dark text-text-main-light dark:text-text-main-dark transition-colors duration-200">
             <StudentSidebar />
             <div className="flex flex-1 flex-col overflow-hidden">
-                <Header title="Student Portal" />
+                <Header title="Student Portal" settingsPath="/student/settings" />
                 <main className="flex-1 overflow-y-auto p-8">
                     <Outlet />
                 </main>

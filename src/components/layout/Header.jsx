@@ -1,6 +1,7 @@
 import { Search, Settings, Bell } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
-export function Header({ title }) {
+export function Header({ title, settingsPath }) {
     return (
         <header className="flex h-24 items-center justify-between border-b-2 border-gray-900 dark:border-gray-600 bg-card-light dark:bg-card-dark px-8 transition-colors duration-200">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{title}</h2>
@@ -13,9 +14,23 @@ export function Header({ title }) {
                         type="text"
                     />
                 </div>
-                <button className="flex h-12 w-12 items-center justify-center rounded-xl border-2 border-gray-900 dark:border-gray-600 bg-background-light dark:bg-background-dark text-gray-600 dark:text-gray-300 shadow-sm hover:translate-y-[-2px] transition-transform">
-                    <Settings className="w-5 h-5" />
-                </button>
+                {settingsPath ? (
+                    <Link
+                        to={settingsPath}
+                        aria-label="Settings"
+                        className="flex h-12 w-12 items-center justify-center rounded-xl border-2 border-gray-900 dark:border-gray-600 bg-background-light dark:bg-background-dark text-gray-600 dark:text-gray-300 shadow-sm hover:translate-y-[-2px] transition-transform"
+                    >
+                        <Settings className="w-5 h-5" />
+                    </Link>
+                ) : (
+                    <button
+                        type="button"
+                        aria-label="Settings"
+                        className="flex h-12 w-12 items-center justify-center rounded-xl border-2 border-gray-900 dark:border-gray-600 bg-background-light dark:bg-background-dark text-gray-600 dark:text-gray-300 shadow-sm hover:translate-y-[-2px] transition-transform"
+                    >
+                        <Settings className="w-5 h-5" />
+                    </button>
+                )}
                 <button className="flex h-12 w-12 items-center justify-center rounded-xl border-2 border-gray-900 dark:border-gray-600 bg-background-light dark:bg-background-dark text-primary shadow-sm hover:translate-y-[-2px] transition-transform">
                     <Bell className="w-5 h-5" />
                 </button>

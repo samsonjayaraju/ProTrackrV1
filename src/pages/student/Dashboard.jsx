@@ -1,9 +1,12 @@
 import { Folder, CheckCircle, Clock } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 
 export function Dashboard() {
+    const navigate = useNavigate();
+
     return (
         <div className="space-y-8">
             {/* Stats Cards */}
@@ -100,7 +103,11 @@ export function Dashboard() {
                     <div className="flex flex-col gap-5">
                         <h3 className="text-xl font-semibold text-text-main-light dark:text-white">Quick Actions</h3>
                         <div className="flex flex-col gap-4">
-                            <Button size="lg" className="w-full justify-start shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-primary text-white">
+                            <Button
+                                size="lg"
+                                className="w-full justify-start shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-primary text-white"
+                                onClick={() => navigate('/student/projects')}
+                            >
                                 <span className="flex-1 text-left py-2">
                                     <p className="font-bold">New Project</p>
                                     <p className="text-xs text-white/80 font-normal">Start a new draft</p>
@@ -108,7 +115,12 @@ export function Dashboard() {
                                 <span>→</span>
                             </Button>
 
-                            <Button size="lg" variant="secondary" className="w-full justify-start rounded-2xl shadow-sm border border-transparent dark:border-border-dark">
+                            <Button
+                                size="lg"
+                                variant="secondary"
+                                className="w-full justify-start rounded-2xl shadow-sm border border-transparent dark:border-border-dark"
+                                onClick={() => navigate('/student/portfolio')}
+                            >
                                 <span className="flex-1 text-left py-2">
                                     <p className="font-bold text-text-main-light dark:text-white">Update Portfolio</p>
                                     <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark font-normal">Refresh live site</p>
